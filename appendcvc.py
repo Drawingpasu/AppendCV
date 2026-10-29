@@ -1,23 +1,38 @@
 import numpy as np
 from scipy.io import wavfile
 from VowelSynthesizer import gen_vowel
+from VowelSynthesizer.gen_vowel import vowelseps
 
 path = "AppendCV/assets-c/"
-filename = {
-    'ㅅ': "s.wav",
-    'ㅆ': "ss.wav",
-    'ㅎ': "h_sound.wav"
+filename = { #[ㅏ, ㅣ, ㅜ, ㅔ, ㅗ, ㅡ, ㅓ]
+    'ㅅ': ["s.wav", "s.wav", "s.wav", "s.wav", "s.wav", "s.wav", "s.wav"],
+    'ㅆ': ["ss.wav", "ss.wav", "ss.wav", "ss.wav", "ss.wav", "ss.wav", "ss.wav"],
+    'ㅎ': ["h_a.wav", "h_i.wav", "h_u.wav", "h_e.wav", "h_o.wav", "h_eu.wav", "h_eo.wav"]
+}
+
+
+Vcode = {
+    'ㅏ': 0, '아': 0,
+    'ㅣ': 1, '이': 1,
+    'ㅜ': 2, '우': 2,
+    'ㅔ': 3, '에': 3, 'ㅐ': 3, '애': 3,
+    'ㅗ': 4, '오': 4,
+    'ㅡ': 5, '으': 5,
+    'ㅓ': 6, '어': 6
+
 }
 
 #각 자음별 (초성일때) 자음->모음 전환되면서 겹치는 시간(초)
 overlapsec = {
     'ㅅ': 0.015,
     'ㅆ': 0.015,
-    'ㅎ': 0.015
+    'ㅎ': 0.070
 }
 
-def wav2strnp(c): #c는 문자임
-    sample_rate, output = wavfile.read(path + filename[c])
+
+
+def wav2strnp(c, vcode): #c는 문자임
+    sample_rate, output = wavfile.read(path + filename[c][vcode])
     output = np.column_stack((output, output)).flatten().astype(np.int16)
     return output
 
@@ -62,7 +77,14 @@ def crossfade(au1, au2, transSec, sample_rate = 44100): #au1랑 au2는 모두 �
 def append(c1, v, c2, pitch, duration): #c1과 c2는 문자, v는 오디오 넘파이, pitch는 튜플, duration은 실수
     #종성 붙일까 말까는 일단 나중가서 정해도 될듯...
 
-    C = wav2strnp(c1)
+    if v in ['ㅏ', '아', 'ㅣ', '이', 'ㅜ', '우', 'ㅔ', '에', 'ㅐ', '애', 'ㅗ', '오', 'ㅡ', '으', 'ㅓ', '어']:
+        vowelcode = Vcode[v]
+
+    else:
+        realvowel = vowelseps[v][0]
+        vowelcode = Vcode[realvowel]
+
+    C = wav2strnp(c1, vowelcode)
     V = gen_vowel.make_sound(v, pitch, duration)
 
     output = crossfade(C, V, overlapsec[c1])
