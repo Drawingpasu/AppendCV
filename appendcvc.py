@@ -79,7 +79,7 @@ def crossfade(au1, au2, transSec, sample_rate = 44100): #au1랑 au2는 모두 �
 
 
 # 그전에!!! append에서 받는 duration은 모음 기준임!!!
-def append(c1, v, c2, pitch, duration): #c1과 c2는 문자, v는 오디오 넘파이, pitch는 튜플, duration은 실수
+def append(c1, v, c2, pitch, duration): #c1과 v와 c2는 문자, pitch는 튜플, duration은 실수
     if v in ['ㅏ', '아', 'ㅣ', '이', 'ㅜ', '우', 'ㅔ', '에', 'ㅐ', '애', 'ㅗ', '오', 'ㅡ', '으', 'ㅓ', '어']:
         vowelcode = Vcode[v]
 
